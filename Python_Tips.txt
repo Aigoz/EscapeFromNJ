@@ -121,6 +121,19 @@
 			
 	3. 生成器(generator)： 关键字 yield 和 StopIteration. 据说非常强大，没用过。
 
-	4. 
+	4. map函数： 
+	
+		>>> def f(x):
+		...     return x * x
+		...
+		>>> r = map(f, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+		>>> list(r)
+		[1, 4, 9, 16, 25, 36, 49, 64, 81]
+		
+	5. reduce：
+	
+		reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)
+		
+		
 ----
 	
