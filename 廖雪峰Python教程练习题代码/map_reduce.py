@@ -18,7 +18,7 @@ if __name__ == "__main__":
     
     #练习2
     def prod(L):
-        return reduce(lambda x,y: x * x, L)
+        return reduce(lambda x,y: x * y, L)
     
     print('3 * 5 * 7 * 9 =', prod([3, 5, 7, 9]))
     
