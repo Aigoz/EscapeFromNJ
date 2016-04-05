@@ -19,3 +19,15 @@ def by_score(t):
 
 L2 = sorted(L, key=by_score)
 print(L2)
+
+def count():
+    fs = []
+    for i in range(1, 4):
+        def f():
+             return i*i
+        fs.append(f)
+    return fs
+
+f1 = count()
+
+print(f1)
