@@ -145,7 +145,10 @@
 
 			list(filter(is_odd, [1, 2, 4, 5, 6, 9, 10, 15]))
 			# 结果: [1, 5, 9, 15]
-		
+	
+	
+---- 函数.cont -----
+
 	8.	闭包，函数作为参数返回：
 	
 		一个函数可以返回一个计算结果，也可以返回一个函数。
@@ -172,6 +175,28 @@
 			具体原因是，前者返回函数，返回时并未实际执行，i最后都体现为 3.  见： 
 			http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001431835236741e42daf5af6514f1a8917b8aaadff31bf000
 			
-	9.
----- 函数.cont -----
+			
+	9. 匿名函数: lambda, 功能比较有限，只能使用一个表达式，返回值是表达式的结果。
 	
+	
+	10. 装饰器： decorator   "@"    会经常使用在添加日志上
+	
+		作用： 现在，假设我们要增强now()函数的功能，比如，在函数调用前后自动打印日志，但又不希望修改now()函数的定义，这种在代码运行期间动态增加功能的方式，称之为“装饰器”（Decorator）。
+		
+		例子：
+		import functools
+
+		def log(text):
+			def decorator(func):
+				@functools.wraps(func)
+				def wrapper(*args, **kw):
+					print('%s %s():' % (text, func.__name__))
+					return func(*args, **kw)
+				return wrapper
+			return decorator
+			
+		上面 @functools.wraps(func) 相当于，wrapper.__name__ = func.__name__的功能，也是个装饰器，装饰wrapper函数，用于改变函数签名，防止 @log 装饰的函数__name__改变。
+		
+	
+	11. 
+		
