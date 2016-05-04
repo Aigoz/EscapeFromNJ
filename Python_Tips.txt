@@ -195,7 +195,19 @@
 				return wrapper
 			return decorator
 			
-		上面 @functools.wraps(func) 相当于，wrapper.__name__ = func.__name__的功能，也是个装饰器，装饰wrapper函数，用于改变函数签名，防止 @log 装饰的函数__name__改变。
+		@log('execute')
+		def now():
+			print('2016-3-25')
+		
+		
+		>>> now()
+		execute now():
+		2016-3-25
+		
+		>>> now.__name__			#这里如果不加@wraps(func)的话，输出的就是 wrapper, 因为装饰器log返回的是wrapper函数
+		'now'
+			
+		上面 @functools.wraps(func) 相当于， wrapper.__name__ = func.__name__的功能，也是个装饰器，装饰wrapper函数，用于改变函数签名，防止 @log 装饰的函数__name__改变。
 		
 	
 	11. 更多的有用函数可以翻下自带的 functools 模块。
@@ -212,7 +224,7 @@
 	
 	2. 包含多个模块的目录，就是一个 package
 	
-		请注意，每一个包目录下面都会有一个__init__.py的文件，这个文件是必须存在的，否则，Python就把这个目录当成普通目录，而不是一个包。
+		请注意， 每一个包目录下面都会有一个__init__.py的文件， 这个文件是必须存在的， 否则， Python就把这个目录当成普通目录，而不是一个包。
 		__init__.py可以是空文件，也可以有Python代码，因为__init__.py本身就是一个模块，而它的模块名就是 包的名字
 		
 	3. 模块搜索路径:
@@ -229,3 +241,36 @@
 	
 	
 ---- 面向对象 -----	
+
+	1. @property  用来绑定属性，生成get set函数，直接调用属性时，可以直接调用get set函数。   （之前OBJC的时候 就有，类似的功能）
+	
+		直接给例子：
+		
+		class Student(object):
+
+		@property
+		def score(self):
+			return self._score
+
+		@score.setter
+		def score(self, value):
+			if not isinstance(value, int):
+				raise ValueError('score must be an integer!')
+			if value < 0 or value > 100:
+				raise ValueError('score must between 0 ~ 100!')
+			self._score = value
+			
+		
+		>>> s = Student()
+		>>> s.score = 60 	# OK，实际转化为s.set_score(60)
+		>>> s.score 		# OK，实际转化为s.get_score()
+		60
+		>>> s.score = 9999
+		Traceback (most recent call last):
+		  ...
+		ValueError: score must between 0 ~ 100!
+		
+		
+		Tips： 可以通过只设置get函数，不设置setter，来实现只读函数。
+		
+		
