@@ -274,3 +274,47 @@
 		Tips： 可以通过只设置get函数，不设置setter，来实现只读函数。
 		
 		
+	2. 多重继承 MixIn设计
+	
+		比如希望在TCP，UDP服务中实现多用户并发，就可以MixIn 多线程，多进程的类：
+		
+		class MyTCPServer(TCPServer, ForkingMixIn):	#多进程
+			pass
+			
+		class MyUDPServer(UDPServer, ThreadingMixIn): #多线程
+			pass
+		
+	
+	3. 各种特殊用法
+	
+		__slots__： 用来限定动态绑定属性的名字
+		__len__：   用于计算类长度  len()
+		__str__:	类名字 返回 print(Student('Michael')) 输出的字符
+		__repr__：  类似 __str__， 一般用于调试， 直接输入 类实例时返回的字符串。 可以偷懒成 __repr__ = __str__
+		__iter__ __next__：  __iter__返回迭代对象， __next__ 用于获取下一个值，一般用于 for .... in 循环里，直到 StopIteration 异常时，结束循环。
+		
+				例子：
+				class Fib(object):
+				def __init__(self):
+					self.a, self.b = 0, 1 # 初始化两个计数器a，b
+
+				def __iter__(self):
+					return self # 实例本身就是迭代对象，故返回自己
+
+				def __next__(self):
+					self.a, self.b = self.b, self.a + self.b # 计算下一个值
+					if self.a > 100000: # 退出循环的条件
+						raise StopIteration();
+					return self.a # 返回下一个值
+					
+		__getitem__:  获取指定元素，像list 那样直接获取指定属性
+						
+						__getitem__入参可以是 int，也可是是切片对象 slice （比如list(range(100))[5:10]）；也可以是str（对应 dict）
+						
+		__setitem__ __delitem__： 与__getitem__对应
+		__getattr__：  调用不存在的属性时，会调用这个函数。 这个作为动态语言，用途很广。
+		__call__：		直接调用对象实例，会调用这个方法
+		
+		其他更多的可以去这里看： http://docs.python.org/3/reference/datamodel.html#special-method-names
+		
+	4. 
