@@ -321,3 +321,81 @@
 	
 	5. 元类 （ metaclass） 
 		一般用不到： http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014319106919344c4ef8b1e04c48778bb45796e0335839000#0
+		
+		
+---- 错误，调试，测试 -----	
+
+	1. 错误处理： try 当遇到错误时，通过except类型，执行except中内容；否者执行else中内容；最后都会执行finally中内容（可选）
+		
+		支持多层调用。
+		
+		try:
+			print('try...')
+			r = 10 / int('2')
+			print('result:', r)
+		except ValueError as e:
+			print('ValueError:', e)
+		except ZeroDivisionError as e:
+			print('ZeroDivisionError:', e)
+		else:
+			print('no error!')
+		finally:
+			print('finally...')
+		print('END')
+		
+		
+	2. 所有的错误类型都是类，派生于 BaseException。 except错误时，父类也会符合条件，可能导致子类未识别到。
+	
+		具体看： https://docs.python.org/3/library/exceptions.html#exception-hierarchy
+				
+	3. 记录错误日志： 可以通过内置的logging 模块，logging输出位置，需要提前配置
+	
+		例子：	
+		import logging
+
+		def foo(s):
+			return 10 / int(s)
+
+		def bar(s):
+			return foo(s) * 2
+
+		def main():
+			try:
+				bar('0')
+			except Exception as e:
+				logging.exception(e)
+
+		main()
+		print('END')
+		
+	4.  定义错误，抛出错误： 
+	
+		class FooError(ValueError):
+			pass
+
+		def foo(s):
+			n = int(s)
+			if n==0:
+				raise FooError('invalid value: %s' % s)
+			return 10 / n
+			
+	5. 处理异常时，如果当前函数处理不了，则直接通过 raise 返回给上层函数处理。
+	
+	6. 调试手段
+		
+		a. print()
+		
+		b. assert  运行时 带 -O 可屏蔽
+		
+			assert n != 0, 'n is zero!'
+			
+		c. logging, 最靠谱的手段  有debug，info，warning，error等几个级别
+		
+			import logging
+			logging.basicConfig(level=logging.INFO)
+			logging.info('n = %d' % n)
+			
+		d. pdb 类似 gdb, 以参数-m pdb启动  “python3 -m pdb err.py”  具体指令和GDB 差不多
+			pdb.set_trace() 人为打断点
+			
+		e. IDE........
