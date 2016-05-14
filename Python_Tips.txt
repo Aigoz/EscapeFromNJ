@@ -399,3 +399,81 @@
 			pdb.set_trace() 人为打断点
 			
 		e. IDE........
+		
+	7. 单元测试，文档测试（这个看起来挺好）
+	
+		文档测试例子： doctest.testmod() 调用文档测试  ''' ''' 中间是文档测试内容
+		
+		# mydict2.py
+		class Dict(dict):
+			'''
+			Simple dict but also support access as x.y style.
+
+			>>> d1 = Dict()
+			>>> d1['x'] = 100
+			>>> d1.x
+			100
+			>>> d1.y = 200
+			>>> d1['y']
+			200
+			>>> d2 = Dict(a=1, b=2, c='3')
+			>>> d2.c
+			'3'
+			>>> d2['empty']
+			Traceback (most recent call last):
+				...
+			KeyError: 'empty'
+			>>> d2.empty
+			Traceback (most recent call last):
+				...
+			AttributeError: 'Dict' object has no attribute 'empty'
+			'''
+			def __init__(self, **kw):
+				super(Dict, self).__init__(**kw)
+
+			def __getattr__(self, key):
+				try:
+					return self[key]
+				except KeyError:
+					raise AttributeError(r"'Dict' object has no attribute '%s'" % key)
+
+			def __setattr__(self, key, value):
+				self[key] = value
+
+		if __name__=='__main__':
+			import doctest
+			doctest.testmod()
+			
+---- with 函数 -----
+
+	with具体原理可以baidu下，给人一种很魔术的感觉，既然魔术，肯定是有很多东西需要自己设置的。  
+	python的很多接口支持with，但是自己的接口，如果想支持with，需要实现模块内置函数，具体可以百度，这里只介绍怎么用。
+	
+	with可以用来自动在调用结束实现某些操作（比如释放资源）
+	
+	例子：
+	
+	with open('/path/to/file', 'r') as f:
+		print(f.read())
+		
+	调用 open(), 返回值放在 f, 如果执行成功 调用 print(f.read());  
+	这里无需关注 open()后的文件句柄关闭 f.close(), 因为open支持了with，自动实现了资源释放。
+	
+	等价于：
+	
+	try:
+		f = open('/path/to/file', 'r')
+		print(f.read())
+	finally:
+		if f:
+			f.close()
+
+---- IO -----				
+
+	1. 文件IO 
+	
+		open read write close
+		
+		多用 with 语句配合
+		
+	2. 
