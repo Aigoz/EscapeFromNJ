@@ -1,0 +1,155 @@
+
+---- IO -----				
+
+	1. 文件IO 
+	
+		open read write close
+		
+		多用 with 语句配合
+		
+		strip() : 返回一个删除了'\n' 的字符串
+		
+	2. StringIO BytesIO 接口与文件IO类似，直接操作内存
+	
+---- 文件 & 目录 -----
+
+	1. import os 
+	
+		系统相关模块，调用系统接口
+		
+	2. 	os.path.join: 		生成路径
+		os.path.split:		
+		os.path.splitext:	
+		..... 自己搜 .....
+		
+---- 序列化 -----
+
+可以理解成归档
+
+	1. pickle 模块：
+	
+		python内置，不合其他语言共通，版本见可能存在差异，但是效率应该会比较高。
+		
+		pickle.dumps(d)	返回一个bytes串
+		pickle.loads(bytes_d)
+		pickle.dump(d, f)	f, file-like Object； 把d的内容序列化到 f中
+		pickle.load(f)
+		
+	2. 	XML, JSON 这些通用归档格式  推荐JSON快，更流行
+	
+		看个JSON的例子：
+		
+				{
+					"programmers": [{
+						"firstName": "Brett",
+						"lastName": "McLaughlin",
+						"email": "aaaa"
+					}, {
+						"firstName": "Jason",
+						"lastName": "Hunter",
+						"email": "bbbb"
+					}, {
+						"firstName": "Elliotte",
+						"lastName": "Harold",
+						"email": "cccc"
+					}],
+					"authors": [{
+						"firstName": "Isaac",
+						"lastName": "Asimov",
+						"genre": "sciencefiction"
+					}, {
+						"firstName": "Tad",
+						"lastName": "Williams",
+						"genre": "fantasy"
+					}, {
+						"firstName": "Frank",
+						"lastName": "Peretti",
+						"genre": "christianfiction"
+					}],
+					"musicians": [{
+						"firstName": "Eric",
+						"lastName": "Clapton",
+						"instrument": "guitar"
+					}, {
+						"firstName": "Sergei",
+						"lastName": "Rachmaninoff",
+						"instrument": "piano"
+					}]
+				}
+		
+		所以JSON 和 PYTHON的对应关系：
+		
+				JSON类型			Python类型
+				{}					dict
+				[]					list
+				"string"			str
+				1234.56				int或float
+				true/false			True/False
+				null				None
+				
+				
+		使用方法： 类似 pickle
+
+				>>> import json
+				>>> d = dict(name='Bob', age=20, score=88)
+				>>> json.dumps(d)
+				'{"age": 20, "score": 88, "name": "Bob"}'
+				
+				>>> json_str = '{"age": 20, "score": 88, "name": "Bob"}'
+				>>> json.loads(json_str)
+				{'age': 20, 'score': 88, 'name': 'Bob'}
+		
+		
+		但是json模块默认能够直接转换的 就只有上表中的这些类型，如果希望归档自己的类数据，就会返回类型错误
+		
+		这时候需要自己定义一个函数用来把类转换成 json 模块可以序列化的类型，然后通过转换后再序列化。（通过接口中的 default 参数来指定）
+		
+		通过例子，可以猜到json模块是把类型先通过defult函数转后，再序列化，如果default未指定，就是NONE 不转换
+		
+		例子：
+				import json
+				class Student(object):
+					def __init__(self, name, age, score):
+						self.name = name
+						self.age = age
+						self.score = score
+
+				s = Student('Bob', 20, 88)
+				
+				def student2dict(std):
+				return {
+					'name': std.name,
+					'age': std.age,
+					'score': std.score
+				}
+				
+		>>> print(json.dumps(s, default=student2dict))
+		{"age": 20, "name": "Bob", "score": 88}
+				
+				#反转换
+				
+				def dict2student(d):
+					return Student(d['name'], d['age'], d['score'])
+					
+		>>> json_str = '{"age": 20, "score": 88, "name": "Bob"}'
+		>>> print(json.loads(json_str, object_hook=dict2student))
+		<__main__.Student object at 0x10cd3c190>
+		
+		
+---- 进程 & 线程 -----
+
+	1. 多进程
+	
+		Python支持多种多进程方式
+		
+			a. fork() 和linux 系统接口相同，windows不支持，复制一份当前进程作为子进程往下执行。
+			
+			b. multiprocessing 模块的 Process(起单进程) Pool(进程池)
+			
+			c. subprocess 模块，适用于外部进程，需要控制子进程的输入 输出
+			
+		进程间通信：
+		
+			a. 队列(Queue)
+			
+			b. 
