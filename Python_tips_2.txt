@@ -152,4 +152,4 @@
 		
 			a. 队列(Queue)
 			
-			b. 
+			b. 管道Pipes 
