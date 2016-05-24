@@ -153,3 +153,77 @@
 			a. 队列(Queue)
 			
 			b. 管道Pipes 
+			
+	2. 多线程
+	
+		锁的好处就是确保了某段关键代码只能由一个线程从头到尾完整地执行，
+		坏处当然也很多，首先是阻止了多线程并发执行，包含锁的某段代码实际上只能以单线程模式执行，效率就大大地下降了。
+		其次，由于可以存在多个锁，不同的线程持有不同的锁，并试图获取对方持有的锁时，
+		可能会造成死锁，导致多个线程全部挂起，既不能执行，也无法结束，只能靠操作系统强制终止。
+		
+		使用锁的例子：
+		
+		balance = 0
+		lock = threading.Lock()
+		
+		def change_it(n):
+			# 先存后取，结果应该为0:
+			global balance
+			balance = balance + n
+			balance = balance - n
+
+		def run_thread(n):
+			for i in range(100000):
+				# 先要获取锁:
+				lock.acquire()
+				try:
+					# 放心地改吧:
+					change_it(n)
+				finally:
+					# 改完了一定要释放锁:
+					lock.release()
+					
+		t1 = threading.Thread(target=run_thread, args=(5,))
+		t2 = threading.Thread(target=run_thread, args=(8,))
+		t1.start()
+		t2.start()
+		t1.join()
+		t2.join()
+		print(balance)
+
+		
+		因为Python的线程虽然是真正的线程，但解释器执行代码时，有一个GIL锁：Global Interpreter Lock，
+		任何Python线程执行前，必须先获得GIL锁，然后，每执行100条字节码，解释器就自动释放GIL锁，让别的线程有机会执行。
+		这个GIL全局锁实际上把所有线程的执行代码都给上了锁，所以，多线程在Python中只能交替执行，只能用到1个核。
+		
+		可以通过C扩展来有效利用多核，但是这样就失去了Python简单易用的特点。
+		
+	3. ThreadLocal
+	
+		作用就是线程的局部变量, 省了参数调用的代码。。
+		
+		例子：
+		
+				import threading
+
+				# 创建全局ThreadLocal对象:
+				local_school = threading.local()
+
+				def process_student():
+					# 获取当前线程关联的student:
+					std = local_school.student
+					print('Hello, %s (in %s)' % (std, threading.current_thread().name))
+
+				def process_thread(name):
+					# 绑定ThreadLocal的student:
+					local_school.student = name
+					process_student()
+
+				t1 = threading.Thread(target= process_thread, args=('Alice',), name='Thread-A')
+				t2 = threading.Thread(target= process_thread, args=('Bob',), name='Thread-B')
+				t1.start()
+				t2.start()
+				t1.join()
+				t2.join()
+				
+	ThreadLocal 最常用的地方就是为每个线程绑定一个数据库连接，HTTP请求，用户身份信息等，这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
