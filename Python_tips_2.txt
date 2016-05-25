@@ -248,4 +248,4 @@
 		
 		python里可以通过 multiprocessing 子模块 managers 轻松实现。
 		
-		
+		例子见：  \廖雪峰Python教程练习题代码\进程线程\分布式进程   task_master.py 和 task_worker.py
