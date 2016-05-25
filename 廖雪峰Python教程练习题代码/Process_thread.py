@@ -26,7 +26,7 @@ def myTest(s):
         print('Print test string ' + s)
         
 if __name__=='__main__':
-    # 父进程创建Queue，并传给各个子进程：
+    # 父进程创建Queue，并传给各个子进程：cterminate()gaiche
     q = Queue()
     pw = Process(target=write, args=(q,))
     pr = Process(target=read, args=(q,))
@@ -41,6 +41,6 @@ if __name__=='__main__':
     
     pMy = Process(target=myTest, args=('yht',))
     pMy.start()
-    pMy.join()
+    pMy.terminate()
     
     print('Main Process End.')
