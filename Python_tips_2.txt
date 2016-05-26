@@ -249,3 +249,15 @@
 		python里可以通过 multiprocessing 子模块 managers 轻松实现。
 		
 		例子见：  \廖雪峰Python教程练习题代码\进程线程\分布式进程   task_master.py 和 task_worker.py
+		
+		
+---- 正则表达式 -----
+
+	1. 具体关键字 忘记了百度下。
+	
+	2. re模块
+	
+		python 字符串带转义，所以如果要输入正则中的 \ 需要变成 \\。
+		
+		最好是通过 r'xxxx' 这种不带转义的方式来实现正则表达式
+		
