@@ -4,6 +4,7 @@
 from datetime import datetime
 import os
 
+'''
 pwd = os.path.abspath('.')
 
 print('      Size     Last Modified  Name')
@@ -14,3 +15,6 @@ for f in os.listdir(pwd):
     mtime = datetime.fromtimestamp(os.path.getmtime(f)).strftime('%Y-%m-%d %H:%M:%S')
     flag = '/' if os.path.isdir(f) else ''
     print('%10d  %s  %s%s' % (fsize, mtime, f, flag))
+'''
+
+print 's','o','b'
