@@ -46,23 +46,75 @@ if __name__=='__main__':
     raw_input('End')
 '''
 
+def xChange_ByPath(inPath_local = inputPath, outPath_local = OUTPUT_PATH, type = xChangeCore.XCHANGETYPE_MEM_ZERO):
+    
+    for tempX in os.listdir(inPath_local):
+        tempDir_or_File = os.path.join(inPath_local, tempX)
+        
+        if os.path.isdir(tempDir_or_File):
+            tempOutDir = os.path.join(outPath_local, tempX)
+            os.mkdir(tempOutDir)
+            xChange_ByPath(tempDir_or_File, tempOutDir, type)
+        
+        elif os.path.isfile(tempDir_or_File):
+            tempOutFile = os.path.join(outPath_local, tempX)
+            xChangeCore.xChange_Mem_Zero(tempDir_or_File, tempOutFile, type)
+        else:
+            pass
+def openUserFile(filePath):
+    '''
+    Need close fileObj
+    '''
+    if os.path.isfile(filePath):
+        fileObj = open(filePath, 'r+')
+    else:
+        fileObj = open(filePath, 'w')
+        fileObj.close()
+        fileObj = open(filePath, 'r+')
+    return fileObj
+
+def get_UserName():
+    fileHanle = openUserFile('.\\usrname.txt')
+    
 if __name__ == '__main__':
 
-    oscommand = 'dir'
-    osResult = os.popen(oscommand).readlines()
+    #oscommand = 'dir'
+    #osResult = os.popen(oscommand).readlines()
     
-    print osResult
+    #print osResult
+    userHost = raw_input('IP: ')
+    userPort = raw_input('Port: ')
     
+    try: 
+        tn = telnetlib.Telnet(userHost, userPort, timeout = 0.5)
+        tnResult = tn.read_until('Username:', 1)
+    except BaseException as e :
+        print e
+    finally:
+        if tn:
+            tn.close()
+            
+    
+    try:
+        usrNameFileHandle = openUserFile('.\\usrname.txt')
+    except BaseException as e:
+        print 'Read username file error. '
+        
+    try:
+        usrPasswdFileHandle = openUserFile('.\\password.txt')
+    except BaseException as e:
+        print 'Read password file error. '
+
     tnStr = ''
-    tn1 = telnetlib.Telnet('10.136.6.204', port = 23, timeout = 0.5)
+    tn1 = telnetlib.Telnet('fafa.124.300', port = 23, timeout = 0.5)
     while True:
         try:
             tnStr += tn1.read_some()
         except BaseException as e:
-            print tnStr, e
+            print tnStr
+            print e
             break
     tn1.close()
-    print 'Done'
     '''
     try:
         tn = telnetlib.Telnet('10.136.6.204', port = 23, timeout = 2)
