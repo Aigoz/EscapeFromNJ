@@ -5,6 +5,7 @@ Created on 2016-5-28
 @author: y00272684
 '''
 import telnetlib, time, sys, os
+from _socket import gaierror, timeout
 
 '''
 def do_telnet(Host, Port, username, password, finish):  
@@ -45,22 +46,13 @@ if __name__=='__main__':
     
     raw_input('End')
 '''
-
+'''
 def xChange_ByPath(inPath_local = inputPath, outPath_local = OUTPUT_PATH, type = xChangeCore.XCHANGETYPE_MEM_ZERO):
     
     for tempX in os.listdir(inPath_local):
         tempDir_or_File = os.path.join(inPath_local, tempX)
         
-        if os.path.isdir(tempDir_or_File):
-            tempOutDir = os.path.join(outPath_local, tempX)
-            os.mkdir(tempOutDir)
-            xChange_ByPath(tempDir_or_File, tempOutDir, type)
-        
-        elif os.path.isfile(tempDir_or_File):
-            tempOutFile = os.path.join(outPath_local, tempX)
-            xChangeCore.xChange_Mem_Zero(tempDir_or_File, tempOutFile, type)
-        else:
-            pass
+'''
 def openUserFile(filePath):
     '''
     Need close fileObj
@@ -73,38 +65,116 @@ def openUserFile(filePath):
         fileObj = open(filePath, 'r+')
     return fileObj
 
-def get_UserName():
-    fileHanle = openUserFile('.\\usrname.txt')
+def get_FileHandle(filePath):
+    try:
+        fileHanle = openUserFile(filePath)
+        return fileHanle
+    except BaseException as e:
+        print e
+        return None
     
+def do_checkPassword(tn):
+    pass
+
+
 if __name__ == '__main__':
 
-    #oscommand = 'dir'
-    #osResult = os.popen(oscommand).readlines()
+    isPasswd = True
+    isUsername = True
+    isCorect = False
+    isUsernameUpdate = True
+    isPasswordRefresh = False
     
-    #print osResult
     userHost = raw_input('IP: ')
     userPort = raw_input('Port: ')
     
+    username = ''
+    password = ''
+    
     try: 
-        tn = telnetlib.Telnet(userHost, userPort, timeout = 0.5)
-        tnResult = tn.read_until('Username:', 1)
+        fileUsername = get_FileHandle(r'.\usrname.txt')
+        filePassword = get_FileHandle(r'.\password.txt')
+        tn = None
+        
+        while True:
+            tn = telnetlib.Telnet(userHost, userPort, timeout = 0.5)
+            tnResult = tn.read_until('Username:', 1)
+            if len(tnResult):
+                isUsername = True
+            else:
+                isUsername = False
+                
+            if isUsername:
+                if isUsernameUpdate:
+                    username = fileUsername.readline()
+                    isUsernameUpdate = False
+                    isPasswordRefresh = True
+                
+                if len(username):
+                    tn.write(str(username) + '\n')
+                else:
+                    tn.close()
+                    print 'There is no password'
+                    break
+   
+            tnResult = tn.read_until('Password:', 1)
+            if len(tnResult):
+                isPasswd = True
+            else:
+                isPasswd = False
+                
+            if isPasswd:
+                if isPasswordRefresh:
+                    filePassword.close()
+                    filePassword = get_FileHandle(r'.\password.txt')
+                    isPasswordRefresh = False
+                password = filePassword.readline()
+                
+                if len(password):
+                    tn.write(str(password) + '\n')
+                    if do_checkPassword(tn):
+                        isCorect = True
+                else:
+                    isUsernameUpdate = True
+
+            tn.close()
+
+            if not (isPasswd or isUsername):
+                print 'There is no password'
+                break
+            
+            if isCorect:
+                print '''
+                Username: %s
+                Passwod: %s
+                ''' % (username, password)
+                break;
+
+    except gaierror as e:
+        print 'Error: ', e
+        print 'Please check your IP address or port.'
+        
+    except timeout as e:
+        print 'Error: ', e
+        print 'da wang you TMD feng bao le???'
+        
     except BaseException as e :
-        print e
+        print (' ',e)
+        
     finally:
         if tn:
             tn.close()
-            
-    
-    try:
-        usrNameFileHandle = openUserFile('.\\usrname.txt')
-    except BaseException as e:
-        print 'Read username file error. '
         
-    try:
-        usrPasswdFileHandle = openUserFile('.\\password.txt')
-    except BaseException as e:
-        print 'Read password file error. '
+        if fileUsername:
+            fileUsername.close()
+            
+        if filePassword:
+            filePassword.close()
+            
+        raw_input('Press any key to close this window.')
+            
 
+    '''
     tnStr = ''
     tn1 = telnetlib.Telnet('fafa.124.300', port = 23, timeout = 0.5)
     while True:
@@ -115,6 +185,8 @@ if __name__ == '__main__':
             print e
             break
     tn1.close()
+    '''
+        
     '''
     try:
         tn = telnetlib.Telnet('10.136.6.204', port = 23, timeout = 2)
