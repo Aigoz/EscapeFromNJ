@@ -1,0 +1,8 @@
+
+Warning: Telnet is not a secure protocol, and it is recommended to use Stelnet.
+
+Login authentication
+
+
+Password:
+<AC6605_187>

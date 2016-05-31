@@ -1,0 +1,14 @@
+
+
+Login authentication
+
+
+Username:huawei
+Password:
+Error: Authentication failed.
+
+  Error:Logged Fail!
+
+  Please retry after 5 seconds.
+
+Username:

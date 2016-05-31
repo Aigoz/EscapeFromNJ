@@ -1,0 +1,9 @@
+
+Warning: Telnet is not a secure protocol, and it is recommended to use Stelnet.
+Warning: There is a risk on the user-interface which you login through. Please change the configuration of the user-interface as soon as possible. 
+
+Info: The max number of VTY users is 20, and the number
+      of current VTY users on line is 3.
+      The current login time is 2014-05-31 17:12:02+00:00.
+Warning: Current license state is Trial. 7 days remain!
+<S12700_204>
