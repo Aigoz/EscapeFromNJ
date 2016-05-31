@@ -1,0 +1,34 @@
+
+
+Login authentication
+
+
+Username:huawei
+Password:
+  -----------------------------------------------------------------------------     
+  User last login information:     
+  -----------------------------------------------------------------------------
+  Access Type: Telnet      
+  IP-Address : 10.138.105.92     
+  Time       : 2016-05-31 17:09:37+00:00     
+  -----------------------------------------------------------------------------
+<AR2220_124_131>display user?
+  user-group      User group
+  user-interface  <Group> user-interface command group
+  users           The status and configuration of a user interface
+<AR2220_124_131>display users
+  User-Intf    Delay    Type   Network Address     AuthenStatus    AuthorcmdFlag
+  129 VTY 0   125:38:38 TEL    10.135.30.60              pass                     
+  Username : huawei              
+
+  130 VTY 1   73:20:07  TEL    10.138.105.92             pass                     
+  Username : huawei              
+
++ 131 VTY 2   00:00:00  TEL    10.138.105.92             pass                     
+  Username : huawei              
+
+  132 VTY 3   00:01:02  TEL    10.138.105.92             pass                     
+  Username : huawei              
+
+
+<AR2220_124_131>
